@@ -8,7 +8,7 @@
             <v-card class="pa-4">
               <v-card-title class="logo py-4 d-flex justify-center">
                 <!-- Logo -->
-                <DLLogo />
+                <DLLogo :size="180" />
               </v-card-title>
 
               <v-card-title class="text-h2 d-flex justify-center">
@@ -65,6 +65,8 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <!-- Footer -->
     <DLFooter />
 
     <!-- SnackBar -->

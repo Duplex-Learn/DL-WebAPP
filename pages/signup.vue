@@ -8,7 +8,7 @@
             <v-card class="pa-4">
               <!-- Logo -->
               <v-card-title class="logo py-4 d-flex justify-center">
-                <DLLogo />
+                <DLLogo :size="180" />
               </v-card-title>
 
               <v-card-title class="text-h2 d-flex justify-center">
@@ -66,8 +66,8 @@
                   ></v-checkbox>
                   <div>
                     <v-chip
-                      v-for="(agreement, i) in agreements"
-                      :key="i"
+                      v-for="agreement in agreements"
+                      :key="agreement.title"
                       class="ma-2"
                       :href="agreement.href"
                     >
@@ -98,6 +98,8 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <!-- Footer -->
     <DLFooter />
 
     <!-- SnackBar -->
