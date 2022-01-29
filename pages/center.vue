@@ -65,6 +65,7 @@
 <script>
 export default {
   name: 'CenterPage',
+  middleware: ['jwt', 'auth'],
   data() {
     return {
       text: {

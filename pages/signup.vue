@@ -20,79 +20,94 @@
               >
                 {{ text.subtitle }}
               </v-card-title>
-              <v-card-text>
-                <!-- From -->
-                <v-form ref="form">
-                  <!-- E-mail -->
-                  <v-text-field
-                    v-model="form.email"
-                    :error-messages="emailErrors"
-                    :label="text.email"
-                    required
-                    @input="$v.form.email.$touch()"
-                    @blur="$v.form.email.$touch()"
-                  ></v-text-field>
+              <template v-if="!finish">
+                <v-card-text>
+                  <!-- From -->
+                  <v-form ref="form">
+                    <!-- E-mail -->
+                    <v-text-field
+                      v-model="form.email"
+                      :error-messages="emailErrors"
+                      :label="text.email"
+                      required
+                      @input="$v.form.email.$touch()"
+                      @blur="$v.form.email.$touch()"
+                    ></v-text-field>
 
-                  <!-- Password -->
-                  <v-text-field
-                    v-model="form.password"
-                    :error-messages="passwordErrors"
-                    :label="text.password"
-                    type="password"
-                    required
-                    @input="$v.form.password.$touch()"
-                    @blur="$v.form.password.$touch()"
-                  ></v-text-field>
+                    <!-- Password -->
+                    <v-text-field
+                      v-model="form.password"
+                      :error-messages="passwordErrors"
+                      :label="text.password"
+                      type="password"
+                      required
+                      @input="$v.form.password.$touch()"
+                      @blur="$v.form.password.$touch()"
+                    ></v-text-field>
 
-                  <!-- Password Again -->
-                  <v-text-field
-                    v-model="form.passwordAgain"
-                    :error-messages="passwordAgainErrors"
-                    :label="text.passwordAgain"
-                    type="password"
-                    required
-                    @input="$v.form.passwordAgain.$touch()"
-                    @blur="$v.form.passwordAgain.$touch()"
-                  ></v-text-field>
+                    <!-- Password Again -->
+                    <v-text-field
+                      v-model="form.passwordAgain"
+                      :error-messages="passwordAgainErrors"
+                      :label="text.passwordAgain"
+                      type="password"
+                      required
+                      @input="$v.form.passwordAgain.$touch()"
+                      @blur="$v.form.passwordAgain.$touch()"
+                    ></v-text-field>
 
-                  <!-- Checkbox -->
-                  <v-checkbox
-                    v-model="form.checkbox"
-                    :error-messages="checkboxErrors"
-                    :label="text.agree"
-                    required
-                    @change="$v.form.checkbox.$touch()"
-                    @blur="$v.form.checkbox.$touch()"
-                  ></v-checkbox>
-                  <div>
-                    <v-chip
-                      v-for="agreement in agreements"
-                      :key="agreement.title"
-                      class="ma-2"
-                      :href="agreement.href"
-                    >
-                      {{ agreement.title }}
-                    </v-chip>
-                  </div>
-                </v-form>
-              </v-card-text>
-              <v-card-actions>
-                <!-- Button -->
-                <v-btn
-                  block
-                  :loading="loading"
-                  :disabled="loading"
-                  color="primary"
-                  @click="submit"
-                >
-                  {{ text.submit }}
-                </v-btn>
-              </v-card-actions>
+                    <!-- UUID -->
+                    <v-text-field
+                      v-if="!preReg"
+                      v-model="form.uuid"
+                      :label="text.uuid"
+                      required
+                    ></v-text-field>
 
-              <v-card-actions>
-                <!-- Link -->
-                <v-btn text to="/login"> {{ text.login }} </v-btn>
-              </v-card-actions>
+                    <!-- Checkbox -->
+                    <v-checkbox
+                      v-model="form.checkbox"
+                      :error-messages="checkboxErrors"
+                      :label="text.agree"
+                      required
+                      @change="$v.form.checkbox.$touch()"
+                      @blur="$v.form.checkbox.$touch()"
+                    ></v-checkbox>
+                    <div>
+                      <v-chip
+                        v-for="agreement in agreements"
+                        :key="agreement.title"
+                        class="ma-2"
+                        :href="agreement.href"
+                      >
+                        {{ agreement.title }}
+                      </v-chip>
+                    </div>
+                  </v-form>
+                </v-card-text>
+                <v-card-actions>
+                  <!-- Button -->
+                  <v-btn
+                    block
+                    :loading="loading"
+                    :disabled="loading || $v.$invalid"
+                    color="primary"
+                    @click="submit"
+                  >
+                    {{ text.submit }}
+                  </v-btn>
+                </v-card-actions>
+                <v-card-actions>
+                  <!-- Link -->
+                  <v-btn text to="/login"> {{ text.login }} </v-btn>
+                </v-card-actions>
+              </template>
+
+              <!-- Welcome -->
+              <v-card-title v-if="finish" class="text-h6 d-flex justify-center">
+                <v-icon size="50" color="primary" left>mdi-check</v-icon>
+                {{ text.welcome }}
+              </v-card-title>
             </v-card>
           </v-col>
         </v-row>
@@ -134,9 +149,11 @@ export default {
         email: '电子邮箱',
         password: '密码',
         passwordAgain: '确认密码',
+        uuid: '验证码',
         submit: '立即注册',
         login: '登录',
         agree: '我同意下列协议',
+        welcome: '注册成功，即将前往登录页面',
       },
       agreements: [
         {
@@ -148,9 +165,12 @@ export default {
         email: '',
         password: '',
         passwordAgain: '',
+        uuid: '',
         checkbox: false,
       },
       loading: false,
+      preReg: true,
+      finish: false,
     }
   },
   computed: {
@@ -186,8 +206,44 @@ export default {
       this.$v.$touch()
       if (this.$v.$invalid) return
       this.loading = true
-      // TODO do login
-      this.$refs.snackbar.pushError('No-implement')
+      if (this.preReg) {
+        this.$axios
+          .post('/puser', {
+            email: this.form.email,
+          })
+          .then(() => {
+            this.preReg = false
+            this.$refs.snackbar.pushInfo(
+              '请前往您的邮箱查看您的验证码以继续注册'
+            )
+            this.text.submit = '继续注册'
+          })
+          .catch(() => {
+            this.$refs.snackbar.pushError('注册失败，发生了未知错误')
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      } else {
+        this.$axios
+          .post('/user', {
+            email: this.form.email,
+            password: this.form.password,
+            uuid: this.form.uuid,
+          })
+          .then(() => {
+            this.finish = true
+            setTimeout(() => {
+              this.$router.push('/login')
+            }, 2000)
+          })
+          .catch(() => {
+            this.$refs.snackbar.pushError('注册失败，发生了未知错误')
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      }
     },
   },
 }

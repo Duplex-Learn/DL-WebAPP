@@ -1,5 +1,9 @@
 <template>
-  <v-snackbar v-model="snackbar" :timeout="timeout" color="red accent-2">
+  <v-snackbar
+    v-model="snackbar"
+    :timeout="timeout"
+    :color="`${color} accent-2`"
+  >
     {{ errorText }}
 
     <template #action="{ attrs }">
@@ -21,10 +25,17 @@ export default {
       timeout: 2000,
       snackbar: false,
       errorText: '',
+      color: 'red',
     }
   },
   methods: {
     pushError(err) {
+      this.color = 'red'
+      this.errorText = err
+      this.snackbar = true
+    },
+    pushInfo(err) {
+      this.color = 'blue'
       this.errorText = err
       this.snackbar = true
     },

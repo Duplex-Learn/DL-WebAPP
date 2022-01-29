@@ -46,7 +46,7 @@
                 <v-btn
                   block
                   :loading="loading"
-                  :disabled="loading"
+                  :disabled="loading || $v.$invalid"
                   color="primary"
                   @click="submit"
                 >
@@ -77,9 +77,16 @@
 <script>
 import { validationMixin } from 'vuelidate'
 import { required, email } from 'vuelidate/lib/validators'
+import Cookie from 'js-cookie'
 
 export default {
   name: 'LoginPage',
+  middleware: ['jwt'],
+  asyncData({ store, redirect }) {
+    if (store.state.jwt) {
+      redirect('/center')
+    }
+  },
   mixins: [validationMixin],
   validations: {
     form: {
@@ -124,8 +131,28 @@ export default {
       this.$v.$touch()
       if (this.$v.$invalid) return
       this.loading = true
-      // TODO do login
-      this.$refs.snackbar.pushError('No-implement')
+      this.$axios
+        .post('/token', {
+          email: this.form.email,
+          password: this.form.password,
+        })
+        .then((res) => {
+          // Cookies
+          const jwt = res.data.jwt
+          const time = JSON.parse(window.atob(jwt.split('.')[1])).exp
+          const expiresDate = new Date()
+          expiresDate.setTime(time * 1000)
+          console.log(expiresDate)
+          Cookie.set('jwt', jwt, { expires: expiresDate })
+          this.$router.push('/center')
+        })
+        .catch((err) => {
+          this.$refs.snackbar.pushError('登录失败，请检查您的账号信息是否正确')
+          console.log(err)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
   },
 }

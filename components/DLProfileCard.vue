@@ -10,7 +10,7 @@
         <v-list-item-content>
           <div class="text-overline mb-4">用户</div>
           <v-list-item-title class="text-h5 mb-1"> 用户名 </v-list-item-title>
-          <v-list-item-subtitle> email </v-list-item-subtitle>
+          <v-list-item-subtitle> UID: {{ user.id }} </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -35,7 +35,7 @@
         </v-list-item-icon>
 
         <v-list-item-content>
-          <v-list-item-title>xxxxxx@example.com</v-list-item-title>
+          <v-list-item-title>{{ user.email }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
@@ -57,5 +57,24 @@
 <script>
 export default {
   name: 'DLProfileCard',
+  data() {
+    return {
+      user: {
+        email: '',
+        id: 0,
+      },
+    }
+  },
+  fetch() {
+    this.$axios
+      .get('/user', {
+        headers: {
+          Authorization: 'Bearer ' + this.$store.state.jwt,
+        },
+      })
+      .then((res) => {
+        this.user = res.data
+      })
+  },
 }
 </script>
