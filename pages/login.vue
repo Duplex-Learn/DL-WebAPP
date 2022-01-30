@@ -81,13 +81,13 @@ import Cookie from 'js-cookie'
 
 export default {
   name: 'LoginPage',
+  mixins: [validationMixin],
   middleware: ['jwt'],
   asyncData({ store, redirect }) {
     if (store.state.jwt) {
       redirect('/center')
     }
   },
-  mixins: [validationMixin],
   validations: {
     form: {
       email: { required, email },
@@ -142,13 +142,11 @@ export default {
           const time = JSON.parse(window.atob(jwt.split('.')[1])).exp
           const expiresDate = new Date()
           expiresDate.setTime(time * 1000)
-          console.log(expiresDate)
           Cookie.set('jwt', jwt, { expires: expiresDate })
           this.$router.push('/center')
         })
-        .catch((err) => {
+        .catch(() => {
           this.$refs.snackbar.pushError('登录失败，请检查您的账号信息是否正确')
-          console.log(err)
         })
         .finally(() => {
           this.loading = false
