@@ -7,10 +7,9 @@
 
     <v-card-text>
       <v-row>
-        <v-col cols="6"> <DLTutorialItem /></v-col>
-        <v-col cols="6"> <DLTutorialItem /></v-col>
-        <v-col cols="6"> <DLTutorialItem /></v-col>
-        <v-col cols="6"> <DLTutorialItem /></v-col>
+        <v-col md="6" sm="12" v-for="(item, i) in recent" :key="`${i}-recent`">
+          <DLProjectCard :id="item" />
+        </v-col>
       </v-row>
     </v-card-text>
   </v-card>
@@ -19,5 +18,15 @@
 <script>
 export default {
   name: 'DLRecentLearn',
+  data() {
+    return {
+      recent: [],
+    }
+  },
+  mounted() {
+    if (window.localStorage.getItem('recentLearn')) {
+      this.recent = window.localStorage.getItem('recentLearn').split(',')
+    }
+  },
 }
 </script>

@@ -1,5 +1,7 @@
 <template>
-  <div>dsds</div>
+  <v-container fluid>
+    <DLProjects />
+  </v-container>
 </template>
 
 <script>

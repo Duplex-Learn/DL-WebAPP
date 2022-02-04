@@ -36,7 +36,7 @@
       <v-list>
         <v-list-item>
           <v-list-item-icon>
-            <v-icon color="white"> mdi-domain </v-icon>
+            <v-icon> mdi-domain </v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
@@ -53,7 +53,7 @@
 
         <v-list-item>
           <v-list-item-icon>
-            <v-icon color="white"> mdi-email </v-icon>
+            <v-icon> mdi-email </v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
@@ -65,7 +65,7 @@
 
         <v-list-item>
           <v-list-item-icon>
-            <v-icon color="white"> mdi-link </v-icon>
+            <v-icon> mdi-link </v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
