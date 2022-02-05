@@ -32,7 +32,7 @@
     </v-img>
 
     <v-card-actions>
-      <v-btn text :to="`/project/${pid}/overview`" nuxt> 开始学习 </v-btn>
+      <v-btn text :to="`/project/${slug}/overview`" nuxt> 开始学习 </v-btn>
       <v-spacer></v-spacer>
     </v-card-actions>
   </v-card>
@@ -42,9 +42,9 @@
 export default {
   name: 'DLProjectCard',
   props: {
-    id: {
-      type: Number,
-      default: null,
+    slug: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -55,7 +55,7 @@ export default {
   },
   async fetch() {
     await this.$axios
-      .get(`/project/${this.pid}/meta`, {
+      .get(`/project/${this.slug}/meta`, {
         headers: {
           Authorization: 'Bearer ' + this.$store.state.jwt,
         },

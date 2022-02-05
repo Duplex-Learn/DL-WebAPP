@@ -20,7 +20,7 @@
       <v-card-text>
         <v-row>
           <v-col v-for="project in projects" :key="project.id" md="6" sm="12">
-            <DLProjectCard :id="project.id" />
+            <DLProjectCard :slug="project.slug" />
           </v-col>
         </v-row>
       </v-card-text>

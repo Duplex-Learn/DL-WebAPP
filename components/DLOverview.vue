@@ -1,7 +1,6 @@
 <template>
   <v-container fluid>
     <DLProfileCard />
-    <DLRecentLearn />
   </v-container>
 </template>
 

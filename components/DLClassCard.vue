@@ -28,7 +28,12 @@
       {{ meta.overview }}
     </v-card-text>
     <v-card-actions>
-      <v-btn text color="primary" :to="`/project/${id}/classes/${slug}`" nuxt>
+      <v-btn
+        text
+        color="primary"
+        :to="`/project/${slug}/classes/${classSlug}`"
+        nuxt
+      >
         开始学习
       </v-btn>
     </v-card-actions>
@@ -39,11 +44,11 @@
 export default {
   name: 'DLClassCard',
   props: {
-    id: {
-      type: Number,
-      default: 0,
-    },
     slug: {
+      type: String,
+      default: '',
+    },
+    classSlug: {
       type: String,
       default: '',
     },
@@ -55,7 +60,7 @@ export default {
   },
   async fetch() {
     await this.$axios
-      .get(`/project/${this.id}/classes/${this.slug}`, {
+      .get(`/project/${this.slug}/classes/${this.classSlug}`, {
         headers: {
           Authorization: 'Bearer ' + this.$store.state.jwt,
         },

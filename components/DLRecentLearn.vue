@@ -8,7 +8,7 @@
     <v-card-text>
       <v-row>
         <v-col md="6" sm="12" v-for="(item, i) in recent" :key="`${i}-recent`">
-          <DLProjectCard :id="item" />
+          <DLProjectCard :slug="item" />
         </v-col>
       </v-row>
     </v-card-text>

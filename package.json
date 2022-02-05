@@ -1,6 +1,6 @@
 {
-  "name": "dl-usersys-app",
-  "version": "1.0.0",
+  "name": "dl-web-app",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "nuxt",

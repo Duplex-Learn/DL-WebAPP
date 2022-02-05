@@ -1,20 +1,32 @@
 <template>
   <v-app>
-    <v-app-bar fixed elevate-on-scroll>
+    <v-navigation-drawer v-model="drawer" fixed clipped right app>
+      <v-list>
+        <v-list-item v-for="(item, i) in meta.steps" :key="`${i}-toc`" href="#">
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ i + 1 }}. {{ item.name }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar clipped-right fixed app>
       <v-btn icon @click="$router.go(-1)">
         <v-icon> mdi-chevron-left </v-icon>
       </v-btn>
-      <v-toolbar-title>{{ meta.name }}</v-toolbar-title>
+      <v-toolbar-title>
+        {{ meta.name }}
+      </v-toolbar-title>
       <v-spacer />
       <DLLight />
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
     </v-app-bar>
-
-    <!-- Main -->
     <v-main>
-      <v-parallax height="300" :src="meta.logo">
+      <v-parallax dark height="300" :src="meta.logo">
         <v-row align="center" justify="center">
           <v-col cols="12">
-            <h1 class="text-h4 mb-4">
+            <h1 class="text-h4 font-weight-thin mb-4">
               {{ meta.name }}
             </h1>
             <v-divider />
@@ -31,9 +43,15 @@
             </h4>
             <div class="my-3">
               <v-avatar color="primary" size="32">
-                {{ author.nickname.substr(0, 1) }}
+                {{ project.nickname.substr(0, 1) }}
               </v-avatar>
-              <span class="text-overline"> {{ author.nickname }} </span>
+              <span class="text-overline"> {{ project.nickname }} </span>
+            </div>
+            <div class="my-3">
+              <v-btn :href="project.url" color="primary">
+                <v-icon left>mdi-git</v-icon>
+                <span>帮助我们改进页面</span>
+              </v-btn>
             </div>
           </v-col>
         </v-row>
@@ -63,7 +81,10 @@
               <v-card-title class="text-h5"> 资源 </v-card-title>
               <v-card-text>
                 <ul>
-                  <li v-for="(item, i) in meta.resources" :key="`${i}-res`">
+                  <li
+                    v-for="(item, i) in meta.resources"
+                    :key="`${i}-resources`"
+                  >
                     <v-btn text :href="item.url">
                       {{ item.name }} - {{ item.version }}
                     </v-btn>
@@ -87,37 +108,31 @@
           </v-tab-item>
         </v-tabs-items>
       </v-card>
-      <v-card flat class="my-3">
-        <v-card-title> 项目下包含的课程 </v-card-title>
-        <v-divider />
-        <v-card-text>
-          <v-timeline dense>
-            <v-timeline-item
-              v-for="(slug, i) in meta.classes"
-              :key="`${i}-class`"
-              right
-            >
-              <DLClassCard :id="id" :slug="slug" />
-            </v-timeline-item>
-          </v-timeline>
-        </v-card-text>
-      </v-card>
-    </v-main>
 
-    <!-- Footer -->
+      <v-container>
+        <DLStep
+          v-for="(step, i) in meta.steps"
+          :slug="slug"
+          :key="`${i}-step`"
+          :classSlug="classSlug"
+          :stepSlug="step.slug"
+          :name="`${i + 1}. ${meta.name}`"
+        />
+      </v-container>
+    </v-main>
     <DLFooter />
   </v-app>
 </template>
 
 <script>
 export default {
-  name: 'ProjectPage',
+  name: 'ClassPage',
   async asyncData(app) {
-    const id = parseInt(app.params.id)
     const data = {}
-    data.id = id
+    data.slug = app.params.slug
+    data.classSlug = app.params.classSlug
     await app.$axios
-      .get(`/project/${id}/meta`, {
+      .get(`/project/${data.slug}/classes/${data.classSlug}`, {
         headers: {
           Authorization: 'Bearer ' + app.store.state.jwt,
         },
@@ -126,19 +141,20 @@ export default {
         data.meta = res.data
       })
     await app.$axios
-      .get(`/project/${id}/author`, {
+      .get(`/project/${data.slug}/`, {
         headers: {
           Authorization: 'Bearer ' + app.store.state.jwt,
         },
       })
       .then((res) => {
-        data.author = res.data
+        data.project = res.data
       })
     return data
   },
   data() {
     return {
       tab: null,
+      drawer: null,
     }
   },
   head() {
@@ -157,6 +173,26 @@ export default {
         },
       ],
     }
+  },
+  mounted() {
+    // let recent = []
+    // if (window.localStorage.getItem('recentLearn')) {
+    //   recent = window.localStorage.getItem('recentLearn').split(',')
+    // }
+    // let exists = false
+    // for (const item in recent) {
+    //   if (item === this.id) {
+    //     exists = true
+    //     break
+    //   }
+    // }
+    // if (!exists) {
+    //   if (recent.length >= 6) {
+    //     recent.shift()
+    //   }
+    //   recent.unshift(this.id)
+    //   window.localStorage.setItem('recentLearn', recent.join())
+    // }
   },
 }
 </script>

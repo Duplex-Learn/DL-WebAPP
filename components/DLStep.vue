@@ -4,7 +4,7 @@
 
   <!-- Error -->
   <v-card v-else-if="$fetchState.error">
-    <v-card-title class="text-h3"> 加载失败 </v-card-title>
+    <v-card-title class="text-h3 my-10"> 加载失败 </v-card-title>
     <v-divider></v-divider>
     <v-card-text class="text-body-1 text--primary">
       加载失败，请检查您的网络
@@ -13,6 +13,7 @@
 
   <!-- Card -->
   <v-card v-else class="my-10 pa-5 rounded-tl-xl rounded-br-xl" elevation="5">
+    <v-img src="#" />
     <v-card-title class="text-h3">
       {{ name }}
     </v-card-title>
@@ -24,18 +25,19 @@
 
 <script>
 import { marked } from 'marked'
+import createRenderer from '~/utils/renderer'
 export default {
   name: 'DLStep',
   props: {
-    id: {
-      type: Number,
-      default: 0,
-    },
     slug: {
       type: String,
       default: '',
     },
-    s_slug: {
+    classSlug: {
+      type: String,
+      default: '',
+    },
+    stepSlug: {
       type: String,
       default: '',
     },
@@ -50,13 +52,28 @@ export default {
     }
   },
   async fetch() {
+    const data = {}
     await this.$axios
-      .get(`/project/${this.id}/classes/${this.slug}/steps/${this.s_slug}`, {
+      .get(`/project/${this.slug}/`, {
         headers: {
           Authorization: 'Bearer ' + this.$store.state.jwt,
         },
       })
       .then((res) => {
+        data.project = res.data
+      })
+    await this.$axios
+      .get(
+        `/project/${this.slug}/classes/${this.classSlug}/steps/${this.stepSlug}`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + this.$store.state.jwt,
+          },
+        }
+      )
+      .then((res) => {
+        const renderer = createRenderer(data.project.url)
+        marked.use({ renderer })
         this.content = marked.parse(res.data)
       })
   },
