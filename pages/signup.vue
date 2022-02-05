@@ -8,17 +8,17 @@
             <v-card class="pa-4">
               <!-- Logo -->
               <v-card-title class="logo py-4 d-flex justify-center">
-                <DLLogo :size="180" />
+                <img src="/logo.svg" width="200" />
               </v-card-title>
 
               <v-card-title class="text-h2 d-flex justify-center">
-                {{ text.title }}
+                注册
               </v-card-title>
 
               <v-card-title
                 class="text-subtitle-1 font-italic d-flex justify-center"
               >
-                {{ text.subtitle }}
+                欢迎来到 Duplex Learn
               </v-card-title>
               <template v-if="!finish">
                 <v-card-text>
@@ -28,7 +28,8 @@
                     <v-text-field
                       v-model="form.email"
                       :error-messages="emailErrors"
-                      :label="text.email"
+                      label="电子邮箱"
+                      prepend-icon="mdi-email"
                       required
                       @input="$v.form.email.$touch()"
                       @blur="$v.form.email.$touch()"
@@ -38,7 +39,8 @@
                     <v-text-field
                       v-model="form.password"
                       :error-messages="passwordErrors"
-                      :label="text.password"
+                      label="密码"
+                      prepend-icon="mdi-key"
                       type="password"
                       required
                       @input="$v.form.password.$touch()"
@@ -49,44 +51,46 @@
                     <v-text-field
                       v-model="form.passwordAgain"
                       :error-messages="passwordAgainErrors"
-                      :label="text.passwordAgain"
+                      label="确认密码"
                       type="password"
+                      prepend-icon="mdi-check"
                       required
                       @input="$v.form.passwordAgain.$touch()"
                       @blur="$v.form.passwordAgain.$touch()"
                     ></v-text-field>
 
-                    <!-- UUID -->
-                    <v-text-field
-                      v-if="!preReg"
-                      v-model="form.uuid"
-                      :label="text.uuid"
-                      required
-                    ></v-text-field>
+                    <!-- Captcha -->
+                    <v-scroll-y-transition>
+                      <v-text-field
+                        v-if="!preReg"
+                        v-model="form.captcha"
+                        prepend-icon="mdi-check-decagram"
+                        label="验证码"
+                        required
+                      ></v-text-field>
+                    </v-scroll-y-transition>
 
                     <!-- Checkbox -->
                     <v-checkbox
                       v-model="form.checkbox"
                       :error-messages="checkboxErrors"
-                      :label="text.agree"
+                      label="我同意下列协议"
                       required
                       @change="$v.form.checkbox.$touch()"
                       @blur="$v.form.checkbox.$touch()"
                     ></v-checkbox>
+
+                    <!-- Agreement -->
                     <div>
-                      <v-chip
-                        v-for="agreement in agreements"
-                        :key="agreement.title"
-                        class="ma-2"
-                        :href="agreement.href"
-                      >
-                        {{ agreement.title }}
+                      <v-chip class="ma-2" to="/agreement" nuxt>
+                        《Duplex Learn 用户协议》
                       </v-chip>
                     </div>
                   </v-form>
                 </v-card-text>
+
+                <!-- Submit -->
                 <v-card-actions>
-                  <!-- Button -->
                   <v-btn
                     block
                     :loading="loading"
@@ -94,19 +98,20 @@
                     color="primary"
                     @click="submit"
                   >
-                    {{ text.submit }}
+                    立即注册
                   </v-btn>
                 </v-card-actions>
+
+                <!-- Link -->
                 <v-card-actions>
-                  <!-- Link -->
-                  <v-btn text to="/login"> {{ text.login }} </v-btn>
+                  <v-btn text to="/login" nuxt> 登录 </v-btn>
                 </v-card-actions>
               </template>
 
               <!-- Welcome -->
               <v-card-title v-if="finish" class="text-h6 d-flex justify-center">
                 <v-icon size="50" color="primary" left>mdi-check</v-icon>
-                {{ text.welcome }}
+                <span>注册成功，即将前往登录页面</span>
               </v-card-title>
             </v-card>
           </v-col>
@@ -124,15 +129,38 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, email, sameAs } from 'vuelidate/lib/validators'
+import { required, email, sameAs, minLength } from 'vuelidate/lib/validators'
 
 export default {
   name: 'SignupPage',
   mixins: [validationMixin],
+  data() {
+    return {
+      form: {
+        email: '',
+        password: '',
+        passwordAgain: '',
+        captcha: '',
+        checkbox: false,
+      },
+      loading: false,
+      preReg: true,
+      finish: false,
+    }
+  },
+  head: {
+    title: '注册',
+    meta: [
+      {
+        name: 'description',
+        content: 'Duplex Learn 注册',
+      },
+    ],
+  },
   validations: {
     form: {
       email: { required, email },
-      password: { required },
+      password: { required, minLength: minLength(6) },
       passwordAgain: { sameAsPassword: sameAs('password') },
       checkbox: {
         checked(val) {
@@ -140,38 +168,6 @@ export default {
         },
       },
     },
-  },
-  data() {
-    return {
-      text: {
-        title: '注册',
-        subtitle: '欢迎来到 Duplex Learn',
-        email: '电子邮箱',
-        password: '密码',
-        passwordAgain: '确认密码',
-        uuid: '验证码',
-        submit: '立即注册',
-        login: '登录',
-        agree: '我同意下列协议',
-        welcome: '注册成功，即将前往登录页面',
-      },
-      agreements: [
-        {
-          title: '《Duplex Learn 用户协议》',
-          href: '#',
-        },
-      ],
-      form: {
-        email: '',
-        password: '',
-        passwordAgain: '',
-        uuid: '',
-        checkbox: false,
-      },
-      loading: false,
-      preReg: true,
-      finish: false,
-    }
   },
   computed: {
     emailErrors() {
@@ -185,6 +181,7 @@ export default {
       const errors = []
       if (!this.$v.form.password.$dirty) return errors
       !this.$v.form.password.required && errors.push('密码不能为空')
+      !this.$v.form.password.minLength && errors.push('密码最少为6位')
       return errors
     },
     passwordAgainErrors() {
@@ -216,10 +213,9 @@ export default {
             this.$refs.snackbar.pushInfo(
               '请前往您的邮箱查看您的验证码以继续注册'
             )
-            this.text.submit = '继续注册'
           })
           .catch(() => {
-            this.$refs.snackbar.pushError('注册失败，发生了未知错误')
+            this.$refs.snackbar.pushError('注册失败，请检查您填写的内容')
           })
           .finally(() => {
             this.loading = false
@@ -229,7 +225,7 @@ export default {
           .post('/user', {
             email: this.form.email,
             password: this.form.password,
-            uuid: this.form.uuid,
+            uuid: this.form.captcha,
           })
           .then(() => {
             this.finish = true
@@ -238,7 +234,7 @@ export default {
             }, 2000)
           })
           .catch(() => {
-            this.$refs.snackbar.pushError('注册失败，发生了未知错误')
+            this.$refs.snackbar.pushError('注册失败，请检查您填写的内容')
           })
           .finally(() => {
             this.loading = false

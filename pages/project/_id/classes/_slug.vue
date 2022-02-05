@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app>
     <v-navigation-drawer v-model="drawer" fixed clipped right app>
       <v-list>
         <v-list-item v-for="(item, i) in meta.steps" :key="`${i}-toc`" href="#">
@@ -32,7 +32,11 @@
             <v-divider />
             <h4 class="subheading">
               <div>
-                <v-chip v-for="(item, i) in meta.label" :key="i" class="ma-1">
+                <v-chip
+                  v-for="(item, i) in meta.label"
+                  :key="`${i}-label`"
+                  class="ma-1"
+                >
                   {{ item }}
                 </v-chip>
               </div>
@@ -49,17 +53,15 @@
 
       <v-card>
         <v-tabs v-model="tab" grow>
-          <v-tab> {{ text.overview }} </v-tab>
-          <v-tab> {{ text.resources }} </v-tab>
-          <v-tab> {{ text.ability }} </v-tab>
+          <v-tab> 概述 </v-tab>
+          <v-tab> 资源 </v-tab>
+          <v-tab> 技能 </v-tab>
         </v-tabs>
 
         <v-tabs-items v-model="tab">
           <v-tab-item>
             <v-card flat>
-              <v-card-title class="text-h5">
-                {{ text.overview }}
-              </v-card-title>
+              <v-card-title class="text-h5"> 概述 </v-card-title>
               <v-card-text>
                 <p>
                   {{ meta.overview }}
@@ -70,12 +72,13 @@
 
           <v-tab-item>
             <v-card flat>
-              <v-card-title class="text-h5">
-                {{ text.resources }}
-              </v-card-title>
+              <v-card-title class="text-h5"> 资源 </v-card-title>
               <v-card-text>
                 <ul>
-                  <li v-for="(item, i) in meta.resources" :key="`${i}-res`">
+                  <li
+                    v-for="(item, i) in meta.resources"
+                    :key="`${i}-resources`"
+                  >
                     <v-btn text :href="item.url">
                       {{ item.name }} - {{ item.version }}
                     </v-btn>
@@ -87,9 +90,7 @@
 
           <v-tab-item>
             <v-card flat>
-              <v-card-title class="text-h5">
-                {{ text.ability }}
-              </v-card-title>
+              <v-card-title class="text-h5"> 技能 </v-card-title>
               <v-card-text>
                 <ul>
                   <li v-for="(item, i) in meta.target" :key="`${i}-target`">
@@ -105,8 +106,8 @@
       <v-container>
         <DLStep
           v-for="(step, i) in meta.steps"
-          :key="`${i}-step`"
           :id="id"
+          :key="`${i}-step`"
           :slug="slug"
           :s_slug="step.slug"
           :name="`${i + 1}. ${meta.name}`"
@@ -120,17 +121,6 @@
 <script>
 export default {
   name: 'ClassPage',
-  data() {
-    return {
-      tab: null,
-      drawer: null,
-      text: {
-        overview: '概述',
-        resources: '资源',
-        ability: '技能',
-      },
-    }
-  },
   async asyncData(app) {
     const id = parseInt(app.params.id)
     const data = {}
@@ -155,6 +145,29 @@ export default {
         data.author = res.data
       })
     return data
+  },
+  data() {
+    return {
+      tab: null,
+      drawer: null,
+    }
+  },
+  head() {
+    return {
+      title: this.meta.name,
+      meta: [
+        {
+          name: 'description',
+          content: `Duplex Learn - ${this.meta.name}`,
+        },
+        {
+          name: 'keywords',
+          content:
+            'Duplex Learn,免费,开源,计算机,学习,知识库,实践,软件开发,计算机教程,计算机企业,高校,计算机专业,' +
+            this.meta.label.join(','),
+        },
+      ],
+    }
   },
   mounted() {
     let recent = []

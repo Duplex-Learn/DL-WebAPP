@@ -1,7 +1,24 @@
 <template>
-  <v-card>
+  <!-- Loading -->
+  <v-skeleton-loader v-if="$fetchState.pending" type="card"></v-skeleton-loader>
+
+  <!-- Error -->
+  <v-card v-else-if="$fetchState.error">
     <v-card-title>
-      <v-icon size="42" class="mr-4"> mdi-magnify </v-icon>
+      <v-icon size="42" class="mr-4"> mdi-book </v-icon>
+      <h2 class="text-h4 font-weight-light">加载失败</h2>
+    </v-card-title>
+    <v-divider />
+    <v-card-text> 加载失败，请检查您的网络 </v-card-text>
+    <v-card-actions>
+      <v-btn text color="primary" disabled> 开始学习 </v-btn>
+    </v-card-actions>
+  </v-card>
+
+  <!-- Card -->
+  <v-card v-else>
+    <v-card-title>
+      <v-icon size="42" class="mr-4"> mdi-book </v-icon>
       <h2 class="text-h4 font-weight-light">
         {{ meta.name }}
       </h2>
@@ -11,12 +28,8 @@
       {{ meta.overview }}
     </v-card-text>
     <v-card-actions>
-      <v-btn
-        text
-        color="primary"
-        :to="`/project/${this.id}/classes/${this.slug}`"
-      >
-        {{ text.start }}
+      <v-btn text color="primary" :to="`/project/${id}/classes/${slug}`" nuxt>
+        开始学习
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -38,9 +51,6 @@ export default {
   data() {
     return {
       meta: {},
-      text: {
-        start: '开始学习',
-      },
     }
   },
   async fetch() {

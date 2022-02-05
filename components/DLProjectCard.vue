@@ -1,5 +1,25 @@
 <template>
-  <v-card>
+  <!-- Loading -->
+  <v-skeleton-loader v-if="$fetchState.pending" type="card"></v-skeleton-loader>
+
+  <!-- Error -->
+  <v-card v-else-if="$fetchState.error">
+    <v-img
+      class="white--text align-end"
+      gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+      height="200px"
+    >
+      <v-card-title> 加载失败，请检查您的网络 </v-card-title>
+    </v-img>
+
+    <v-card-actions>
+      <v-btn text disabled> 开始学习 </v-btn>
+      <v-spacer></v-spacer>
+    </v-card-actions>
+  </v-card>
+
+  <!-- Card -->
+  <v-card v-else>
     <v-img
       :src="meta.logo"
       class="white--text align-end"
@@ -12,20 +32,8 @@
     </v-img>
 
     <v-card-actions>
-      <v-btn text :to="`/project/${this.pid}/meta`"> {{ text.start }} </v-btn>
+      <v-btn text :to="`/project/${pid}/overview`" nuxt> 开始学习 </v-btn>
       <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-bookmark</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-share-variant</v-icon>
-      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -39,6 +47,12 @@ export default {
       default: null,
     },
   },
+  data() {
+    return {
+      meta: {},
+      pid: this.id,
+    }
+  },
   async fetch() {
     await this.$axios
       .get(`/project/${this.pid}/meta`, {
@@ -50,19 +64,9 @@ export default {
         this.meta = res.data
       })
   },
-  data() {
-    return {
-      meta: {},
-      pid: this.id,
-      text: {
-        start: '开始学习',
-      },
-    }
-  },
   methods: {
     refresh(id) {
       this.pid = id
-      console.log(this.pid)
       this.$fetch()
     },
   },

@@ -1,28 +1,29 @@
 <template>
-  <v-app dark>
+  <v-app>
     <v-main>
       <v-container>
         <v-row justify="center" align="center">
           <v-col cols="12" sm="8" md="6">
             <!-- Login UI -->
             <v-card class="pa-4">
+              <!-- Logo -->
               <v-card-title class="logo py-4 d-flex justify-center">
-                <!-- Logo -->
-                <DLLogo :size="180" />
+                <img src="/logo.svg" width="200" />
               </v-card-title>
 
               <v-card-title class="text-h2 d-flex justify-center">
-                {{ text.title }}
+                登录
               </v-card-title>
 
+              <!-- From -->
               <v-card-text>
-                <!-- From -->
                 <v-form ref="form">
                   <!-- E-mail -->
                   <v-text-field
                     v-model="form.email"
                     :error-messages="emailErrors"
-                    :label="text.email"
+                    label="电子邮箱"
+                    prepend-icon="mdi-email"
                     required
                     @input="$v.form.email.$touch()"
                     @blur="$v.form.email.$touch()"
@@ -32,7 +33,8 @@
                   <v-text-field
                     v-model="form.password"
                     :error-messages="passwordErrors"
-                    :label="text.password"
+                    label="密码"
+                    prepend-icon="mdi-key"
                     type="password"
                     required
                     @input="$v.form.password.$touch()"
@@ -41,8 +43,8 @@
                 </v-form>
               </v-card-text>
 
+              <!-- Submit -->
               <v-card-actions>
-                <!-- Button -->
                 <v-btn
                   block
                   :loading="loading"
@@ -50,15 +52,15 @@
                   color="primary"
                   @click="submit"
                 >
-                  {{ text.submit }}
+                  立即登录
                 </v-btn>
               </v-card-actions>
 
+              <!-- Link -->
               <v-card-actions>
-                <!-- Link -->
-                <v-btn text to="/signup"> {{ text.signup }} </v-btn>
+                <v-btn text to="/signup" nuxt> 注册 </v-btn>
                 <v-spacer />
-                <v-btn text> {{ text.forgot }} </v-btn>
+                <v-btn text to="/agreement" nuxt> 忘记密码？ </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -76,7 +78,7 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, email } from 'vuelidate/lib/validators'
+import { required, email, minLength } from 'vuelidate/lib/validators'
 import Cookie from 'js-cookie'
 
 export default {
@@ -91,25 +93,26 @@ export default {
   validations: {
     form: {
       email: { required, email },
-      password: { required },
+      password: { required, minLength: minLength(6) },
     },
   },
   data() {
     return {
-      text: {
-        title: '登录',
-        email: '电子邮箱',
-        password: '密码',
-        submit: '立即登录',
-        signup: '注册',
-        forgot: '忘记密码?',
-      },
       form: {
         email: '',
         password: '',
       },
       loading: false,
     }
+  },
+  head: {
+    title: '登录',
+    meta: [
+      {
+        name: 'description',
+        content: 'Duplex Learn 登录',
+      },
+    ],
   },
   computed: {
     emailErrors() {
@@ -123,6 +126,7 @@ export default {
       const errors = []
       if (!this.$v.form.password.$dirty) return errors
       !this.$v.form.password.required && errors.push('密码不能为空')
+      !this.$v.form.password.minLength && errors.push('密码最少为6位')
       return errors
     },
   },

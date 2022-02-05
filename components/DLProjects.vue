@@ -1,23 +1,36 @@
 <template>
   <v-card class="mx-auto my-5">
-    <v-card-title>
-      <v-icon left>mdi-history</v-icon>
-      {{ text.title }}
+    <!-- Loading -->
+    <v-card-title v-if="$fetchState.pending" class="d-flex justify-center">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-card-title>
 
-    <v-card-text>
-      <v-row>
-        <v-col md="6" sm="12" v-for="project in projects" :key="project.id">
-          <DLProjectCard :id="project.id" />
-        </v-col>
-      </v-row>
-    </v-card-text>
+    <!-- Error -->
+    <v-card-title v-else-if="$fetchState.error">
+      <v-alert dense outlined type="error"> 加载失败，请检查您的网络 </v-alert>
+    </v-card-title>
 
-    <v-card-actions class="d-flex justify-center">
-      <div class="text-center">
-        <v-pagination v-model="page" :length="totalPages"></v-pagination>
-      </div>
-    </v-card-actions>
+    <!-- Profile -->
+    <template v-else>
+      <v-card-title>
+        <v-icon left>mdi-history</v-icon>
+        最新的项目
+      </v-card-title>
+
+      <v-card-text>
+        <v-row>
+          <v-col v-for="project in projects" :key="project.id" md="6" sm="12">
+            <DLProjectCard :id="project.id" />
+          </v-col>
+        </v-row>
+      </v-card-text>
+
+      <v-card-actions class="d-flex justify-center">
+        <div class="text-center">
+          <v-pagination v-model="page" :length="totalPages"></v-pagination>
+        </div>
+      </v-card-actions>
+    </template>
   </v-card>
 </template>
 
@@ -26,9 +39,6 @@ export default {
   name: 'DLProjects',
   data() {
     return {
-      text: {
-        title: '最新的项目',
-      },
       page: 1,
       totalPages: 1,
       projects: [],

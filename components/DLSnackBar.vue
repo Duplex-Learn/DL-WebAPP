@@ -4,11 +4,11 @@
     :timeout="timeout"
     :color="`${color} accent-2`"
   >
-    {{ errorText }}
+    {{ text }}
 
     <template #action="{ attrs }">
       <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
-        {{ text.close }}
+        关闭
       </v-btn>
     </template>
   </v-snackbar>
@@ -19,24 +19,21 @@ export default {
   name: 'DLSnackBar',
   data() {
     return {
-      text: {
-        close: '关闭',
-      },
       timeout: 2000,
       snackbar: false,
-      errorText: '',
+      text: '',
       color: 'red',
     }
   },
   methods: {
-    pushError(err) {
+    pushError(msg) {
       this.color = 'red'
-      this.errorText = err
+      this.text = msg
       this.snackbar = true
     },
-    pushInfo(err) {
+    pushInfo(msg) {
       this.color = 'blue'
-      this.errorText = err
+      this.text = msg
       this.snackbar = true
     },
   },
