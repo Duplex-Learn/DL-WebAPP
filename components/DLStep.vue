@@ -13,7 +13,7 @@
 
   <!-- Card -->
   <v-card v-else class="my-10 pa-5 rounded-tl-xl rounded-br-xl" elevation="5">
-    <v-img src="#" />
+    <a class="anchor" :name="stepSlug" />
     <v-card-title class="text-h3">
       {{ name }}
     </v-card-title>
@@ -79,3 +79,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.anchor {
+  position: relative;
+  top: -100px;
+}
+</style>

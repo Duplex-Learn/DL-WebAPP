@@ -2,7 +2,12 @@
   <v-app>
     <v-navigation-drawer v-model="drawer" fixed clipped right app>
       <v-list>
-        <v-list-item v-for="(item, i) in meta.steps" :key="`${i}-toc`" href="#">
+        <v-subheader>目录</v-subheader>
+        <v-list-item
+          v-for="(item, i) in meta.steps"
+          :key="`${i}-toc`"
+          :href="`#${item.slug}`"
+        >
           <v-list-item-content>
             <v-list-item-title>
               {{ i + 1 }}. {{ item.name }}
@@ -116,7 +121,7 @@
           :key="`${i}-step`"
           :classSlug="classSlug"
           :stepSlug="step.slug"
-          :name="`${i + 1}. ${meta.name}`"
+          :name="`${i + 1}. ${step.name}`"
         />
       </v-container>
     </v-main>
