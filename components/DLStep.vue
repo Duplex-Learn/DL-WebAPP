@@ -25,6 +25,7 @@
 
 <script>
 import { marked } from 'marked'
+import '@/assets/atom-one-dark.css'
 import createRenderer from '~/utils/renderer'
 export default {
   name: 'DLStep',

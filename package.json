@@ -15,6 +15,7 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.19.3",
+    "highlight.js": "^11.4.0",
     "js-cookie": "^3.0.1",
     "js-cookies": "^1.0.4",
     "marked": "^4.0.12",
